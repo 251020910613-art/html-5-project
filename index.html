@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LensLife – Photography Portfolio</title>
+
+  <style>
+    /* ============================================================
+       LensLife Photography – Embedded CSS
+       Requirements:
+       1. Skip link (position + focus)
+       2. Navigation accessible (flex, 3+ CSS properties)
+       3. Grid (featured, about, gear)
+       4. Flex (nav, hero, gallery)
+       5. Box model on images (border, padding, border-radius)
+       6. Grid/Flex applied to parent elements
+       7. hover pseudo-class
+       8. nth-child selector
+    ============================================================ */
+
+    /* ── Reset & Base ── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --clr-bg:       #0d0d0d;
+      --clr-surface:  #161616;
+      --clr-card:     #1e1e1e;
+      --clr-accent:   #e8c96d;
+      --clr-text:     #e8e3d9;
+      --clr-muted:    #8a8680;
+      --clr-nav-bg:   #111111;
+      --font-display: 'Georgia', serif;
+      --font-body:    system-ui, 'Helvetica Neue', Arial, sans-serif;
+      --radius-sm:    6px;
+      --radius-md:    14px;
+      --radius-lg:    28px;
+      --radius-pill:  999px;
+      --transition:   0.3s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--clr-bg);
+      color: var(--clr-text);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    img { max-width: 100%; display: block; }
+    ul  { list-style: none; }
+    a   { color: inherit; text-decoration: none; }
+
+    /* ─────────────────────────────────────────
+       1. SKIP LINK – position + focus
+    ───────────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      z-index: 9999;
+      padding: 0.6rem 1.2rem;
+      background: var(--clr-accent);
+      color: #000;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      transition: top var(--transition);
+    }
+    .skip-link:focus { top: 1rem; }
+
+    /* ─────────────────────────────────────────
+       2. NAVIGATION – flex + 3+ CSS properties
+    ───────────────────────────────────────── */
+    header {
+      background-color: var(--clr-nav-bg);
+      border-bottom: 1px solid #2a2a2a;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    nav {
+      display: flex;                       /* FLEX */
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      gap: 2rem;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--clr-accent);
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .nav-links button {
+      display: inline-block;
+      padding: 0.45rem 1.1rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--clr-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+    }
+
+    .nav-links button.active {
+      background: var(--clr-accent);
+      color: #000;
+    }
+
+    /* 8. HOVER on nav buttons */
+    .nav-links button:hover:not(.active) {
+      background: #2a2a2a;
+      color: var(--clr-text);
+      transform: translateY(-1px);
+    }
+
+    .nav-links button:focus-visible {
+      outline: 2px solid var(--clr-accent);
+      outline-offset: 2px;
+    }
+
+    /* ─────────────────────────────────────────
+       PAGES – shown/hidden via JS
+    ───────────────────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ─────────────────────────────────────────
+       BUTTON COMPONENT
+    ───────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 2rem;
+      background: var(--clr-accent);
+      color: #000;
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+    .btn:hover {
+      background: #f5d87a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,201,109,0.35);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--clr-accent);
+      outline-offset: 3px;
+    }
+
+    /* ─────────────────────────────────────────
+       PAGE: HOME
+    ───────────────────────────────────────── */
+
+    /* Hero – FLEX on parent */
+    .hero {
+      display: flex;                       /* FLEX */
+      align-items: center;
+      gap: 3rem;
+      max-width: 1100px;
+      margin: 4rem auto;
+      padding: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-text { flex: 1 1 340px; }
+
+    .hero-text h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .accent { color: var(--clr-accent); font-style: italic; }
+
+    .hero-text p {
+      color: var(--clr-muted);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero-image-wrap { flex: 1 1 340px; }
+
+    /* 5. BOX MODEL on hero image */
+    .hero-img {
+      border: 3px solid var(--clr-accent);   /* border  */
+      padding: 6px;                            /* padding */
+      border-radius: var(--radius-lg);         /* border-radius */
+      width: 100%;
+      object-fit: cover;
+      aspect-ratio: 4/3;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    /* 8. HOVER on hero image */
+    .hero-img:hover {
+      transform: scale(1.025) rotate(1deg);
+      box-shadow: 0 20px 60px rgba(232,201,109,0.2);
+    }
+
+    /* Featured – GRID on parent */
+    .featured {
+      max-width: 1100px;
+      margin: 0 auto 5rem;
+      padding: 0 2rem;
+    }
+
+    .featured h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: var(--clr-accent);
+    }
+
+    .grid-container {
+      display: grid;                          /* GRID */
+      grid-template-columns: repeat(3, 1fr); /* 3 columns */
+      gap: 1.5rem;
+    }
+
+    .grid-item {
+      background: var(--clr-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    /* 8. HOVER on grid cards */
+    .grid-item:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+
+    /* 5. BOX MODEL on grid images */
+    .grid-item img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border: 2px solid #2a2a2a;                          /* border  */
+      padding: 4px;                                        /* padding */
+      border-radius: var(--radius-md) var(--radius-md) 0 0; /* border-radius */
+      transition: transform var(--transition);
+    }
+    .grid-item:hover img { transform: scale(1.04); }
+
+    .grid-item h3 {
+      padding: 0.75rem 1rem 0.25rem;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--clr-accent);
+    }
+    .grid-item p {
+      padding: 0 1rem 1rem;
+      font-size: 0.9rem;
+      color: var(--clr-muted);
+    }
+
+    /* ─────────────────────────────────────────
+       PAGE: GALLERY
+    ───────────────────────────────────────── */
+    .page-hero {
+      text-align: center;
+      padding: 4rem 2rem 2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .page-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--clr-accent);
+      margin-bottom: 0.75rem;
+    }
+    .page-hero p { color: var(--clr-muted); font-size: 1.05rem; }
+
+    .gallery-section {
+      max-width: 1100px;
+      margin: 2rem auto 5rem;
+      padding: 0 2rem;
+    }
+
+    /* 4. FLEX on gallery parent */
+    .flex-gallery {
+      display: flex;                 /* FLEX */
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      justify-content: center;
+    }
+
+    .gallery-item {
+      flex: 1 1 300px;
+      max-width: 360px;
+      background: var(--clr-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    /* 8. HOVER on gallery items */
+    .gallery-item:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(232,201,109,0.15);
+    }
+
+    /* 5. BOX MODEL on gallery images */
+    .gallery-item img {
+      width: 100%;
+      aspect-ratio: 3/2;
+      object-fit: cover;
+      border: 2px solid #2e2e2e;       /* border  */
+      padding: 5px;                     /* padding */
+      border-radius: var(--radius-md); /* border-radius (default) */
+      transition: transform var(--transition);
+    }
+    .gallery-item:hover img { transform: scale(1.05); }
+
+    /* ── 9. NTH-CHILD SELECTOR ── */
+    /* Odd items: bo tròn nhiều */
+    .gallery-item:nth-child(odd) img {
+      border-radius: var(--radius-lg);
+    }
+    /* Even items: bo tròn ít + viền vàng */
+    .gallery-item:nth-child(even) img {
+      border-radius: var(--radius-sm);
+      border-color: var(--clr-accent);
+    }
+
+    figcaption {
+      padding: 0.6rem 1rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--clr-muted);
+      font-style: italic;
+    }
+
+    /* ─────────────────────────────────────────
+       PAGE: ABOUT
+    ───────────────────────────────────────── */
+    .about-section {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* 3. GRID on about parent */
+    .about-grid {
+      display: grid;                       /* GRID */
+      grid-template-columns: 1fr 1.4fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    /* 5. BOX MODEL on about image */
+    .about-image img {
+      width: 100%;
+      border: 3px solid var(--clr-accent);  /* border  */
+      padding: 6px;                          /* padding */
+      border-radius: var(--radius-lg);       /* border-radius */
+      object-fit: cover;
+      aspect-ratio: 3/4;
+      transition: transform var(--transition), filter var(--transition);
+    }
+    /* 8. HOVER on about image */
+    .about-image img:hover {
+      transform: scale(1.02);
+      filter: brightness(1.1) contrast(1.05);
+    }
+
+    .about-text h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--clr-accent);
+      margin-bottom: 1rem;
+    }
+    .about-text p { color: var(--clr-muted); margin-bottom: 1rem; }
+    .about-text em { color: var(--clr-text); font-style: italic; }
+    .about-text .btn { margin-top: 0.5rem; }
+
+    /* Gear section – GRID 2 cột */
+    .equipment-section {
+      max-width: 1100px;
+      margin: 3rem auto 5rem;
+      padding: 0 2rem;
+    }
+    .equipment-section h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--clr-accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .gear-grid {
+      display: grid;                           /* GRID */
+      grid-template-columns: repeat(2, 1fr);  /* 2 columns */
+      gap: 1.25rem;
+    }
+
+    .gear-card {
+      background: var(--clr-card);
+      border: 1px solid #2a2a2a;
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    /* 8. HOVER on gear cards */
+    .gear-card:hover {
+      border-color: var(--clr-accent);
+      transform: translateY(-4px);
+    }
+    /* 9. NTH-CHILD on gear cards */
+    .gear-card:nth-child(even) {
+      background: #1a1a1a;
+      border-radius: var(--radius-sm);
+    }
+    .gear-card h3 {
+      font-family: var(--font-display);
+      color: var(--clr-accent);
+      margin-bottom: 0.5rem;
+    }
+    .gear-card p { color: var(--clr-muted); font-size: 0.95rem; }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    footer {
+      margin-top: auto;
+      background: var(--clr-nav-bg);
+      border-top: 1px solid #2a2a2a;
+      text-align: center;
+      padding: 1.5rem 2rem;
+      color: var(--clr-muted);
+      font-size: 0.9rem;
+    }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .grid-container,
+      .about-grid,
+      .gear-grid     { grid-template-columns: 1fr; }
+      .hero          { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 500px) {
+      nav { flex-direction: column; gap: 0.75rem; }
+    }
+
+    /* Reduced motion accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       1. SKIP TO MAIN CONTENT
+  ══════════════════════════════════════════ -->
+  <a href="#main-content" class="skip-link">Skip to Main Content</a>
+
+  <!-- ══════════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════════ -->
+  <header role="banner">
+    <nav aria-label="Main navigation">
+      <div class="logo" onclick="showPage('home')" role="link" tabindex="0"
+           onkeydown="if(event.key==='Enter') showPage('home')"
+           aria-label="LensLife – go to home page">
+        📷 LensLife
+      </div>
+      <ul class="nav-links" role="list">
+        <li>
+          <button id="nav-home" onclick="showPage('home')"
+                  aria-current="page" class="active">
+            Home
+          </button>
+        </li>
+        <li>
+          <button id="nav-gallery" onclick="showPage('gallery')">
+            Gallery
+          </button>
+        </li>
+        <li>
+          <button id="nav-about" onclick="showPage('about')">
+            About
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       MAIN – contains all 3 pages
+  ══════════════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- ───────────── PAGE: HOME ───────────── -->
+    <div id="page-home" class="page active" role="region" aria-label="Home page">
+
+      <!-- Hero Section (FLEX) -->
+      <section class="hero" aria-label="Hero banner">
+        <div class="hero-text">
+          <h1>Capture the <span class="accent">Unseen</span></h1>
+          <p>A curated portfolio of light, shadow, and moments frozen in time.</p>
+          <button class="btn" onclick="showPage('gallery')">Explore Gallery</button>
+        </div>
+        <div class="hero-image-wrap">
+          <img
+            src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MDAiIGhlaWdodD0iNTI1IiB2aWV3Qm94PSIwIDAgNzAwIDUyNSI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJza3kiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEyYTRhIi8+PHN0b3Agb2Zmc2V0PSI2MCUiIHN0b3AtY29sb3I9IiNlODkzNmQiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmNWM5N2EiLz48L2xpbmVhckdyYWRpZW50PgogIDxsaW5lYXJHcmFkaWVudCBpZD0ibXQiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmQzZjVlIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMWEyNTM1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjcwMCIgaGVpZ2h0PSI1MjUiIGZpbGw9InVybCgjc2t5KSIvPgogIDxlbGxpcHNlIGN4PSIzNTAiIGN5PSIyMDAiIHJ4PSIxMjAiIHJ5PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjE1KSIvPgogIDxwb2x5Z29uIHBvaW50cz0iMTUwLDM4MCAyODAsMTgwIDQxMCwzODAiIGZpbGw9InVybCgjbXQpIi8+CiAgPHBvbHlnb24gcG9pbnRzPSIyOTAsMzgwIDQzMCwyMDAgNTcwLDM4MCIgZmlsbD0iIzI0MzM1MCIvPgogIDxwb2x5Z29uIHBvaW50cz0iMCwzODAgMTIwLDI0MCAyNDAsMzgwIiBmaWxsPSIjMWUyZDQ1Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSI0NjAsMzgwIDU4MCwyMjAgNzAwLDM4MCIgZmlsbD0iIzFlMmQ0NSIvPgogIDxyZWN0IHk9IjM4MCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSIxNDUiIGZpbGw9IiMwZDE4MjUiLz4KICA8ZWxsaXBzZSBjeD0iMjgwIiBjeT0iNDMwIiByeD0iMTgwIiByeT0iMzAiIGZpbGw9InJnYmEoMjQ1LDIwMSwxMjIsMC4xMikiLz4KICA8Y2lyY2xlIGN4PSI1ODAiIGN5PSI4MCIgcj0iMzUiIGZpbGw9IiNmZmQ5N2EiIG9wYWNpdHk9IjAuOSIvPgogIDx0ZXh0IHg9IjM1MCIgeT0iNDgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiBmb250LXNpemU9IjE4IiBsZXR0ZXItc3BhY2luZz0iNCI+TU9VTlRBSU4gR09MREVOIEhPVVI8L3RleHQ+Cjwvc3ZnPg=="
+            alt="Mountain landscape at golden hour with dramatic clouds"
+            class="hero-img"
+          />
+        </div>
+      </section>
+
+      <!-- Featured Work (GRID – 3 columns) -->
+      <section class="featured" aria-labelledby="featured-heading">
+        <h2 id="featured-heading">Featured Work</h2>
+        <div class="grid-container">
+
+          <article class="grid-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTNhMWEiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZDIwMTAiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0idXJsKCNiZykiLz4KICA8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iMTgwIiByeD0iMTYwIiByeT0iNzAiIGZpbGw9IiMxZTRhMWUiIG9wYWNpdHk9IjAuOCIvPgogIDxwYXRoIGQ9Ik00MCwxODAgUTIwMCwxMjAgMzYwLDE4MCBRMjAwLDI0MCA0MCwxODBaIiBmaWxsPSIjMmE2YjJhIiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSIxNDAiIGN5PSIxNTUiIHI9IjE4IiBmaWxsPSJyZ2JhKDE4MCwyMzAsMjU1LDAuODUpIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDxjaXJjbGUgY3g9IjEzNiIgY3k9IjE1MSIgcj0iNiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjcpIi8+CiAgPGNpcmNsZSBjeD0iMjEwIiBjeT0iMTcwIiByPSIxMiIgZmlsbD0icmdiYSgxODAsMjMwLDI1NSwwLjgpIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8Y2lyY2xlIGN4PSIyMDciIGN5PSIxNjciIHI9IjQiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC42NSkiLz4KICA8Y2lyY2xlIGN4PSIyNzAiIGN5PSIxNTAiIHI9IjIwIiBmaWxsPSJyZ2JhKDE4MCwyMzAsMjU1LDAuODUpIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDxjaXJjbGUgY3g9IjI2NiIgY3k9IjE0NiIgcj0iNyIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjcpIi8+CiAgPHRleHQgeD0iMjAwIiB5PSIyNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4yNSkiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiBmb250LXNpemU9IjE0IiBsZXR0ZXItc3BhY2luZz0iMyI+TU9STklORyBERVc8L3RleHQ+Cjwvc3ZnPg=="
+              alt="Close-up of dewdrops on a green leaf in morning light"
+            />
+            <h3>Morning Dew</h3>
+            <p>Macro photography capturing nature's quiet details.</p>
+          </article>
+
+          <article class="grid-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJza3kyIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzViYTNkOSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2E4ZDRmNSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSJ1cmwoI3NreTIpIi8+CiAgPHJlY3QgeT0iMTgwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzRhN2MzZiIvPgogIDxjaXJjbGUgY3g9IjgwIiBjeT0iMTc1IiByPSIyNSIgZmlsbD0iI2U4NTU2YSIvPgogIDxjaXJjbGUgY3g9IjEzMCIgY3k9IjE2MCIgcj0iMjAiIGZpbGw9IiNmNWE2MjMiLz4KICA8Y2lyY2xlIGN4PSIxODAiIGN5PSIxNzAiIHI9IjI4IiBmaWxsPSIjZTg0MzkzIi8+CiAgPGNpcmNsZSBjeD0iMjQwIiBjeT0iMTU4IiByPSIyMiIgZmlsbD0iI2E4NTVmNyIvPgogIDxjaXJjbGUgY3g9IjI5NSIgY3k9IjE2OCIgcj0iMjYiIGZpbGw9IiNlZjQ0NDQiLz4KICA8Y2lyY2xlIGN4PSIzNDUiIGN5PSIxNTUiIHI9IjE5IiBmaWxsPSIjZjU5ZTBiIi8+CiAgPGNpcmNsZSBjeD0iNjAiIGN5PSIxODUiIHI9IjE1IiBmaWxsPSIjZWM0ODk5Ii8+CiAgPGNpcmNsZSBjeD0iMzgwIiBjeT0iMTc4IiByPSIxNyIgZmlsbD0iIzhiNWNmNiIvPgogIDx0ZXh0IHg9IjIwMCIgeT0iMjcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuNCkiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiBmb250LXNpemU9IjE0IiBsZXR0ZXItc3BhY2luZz0iMyI+V0lMREZMT1dFUiBGSUVMRFM8L3RleHQ+Cjwvc3ZnPg=="
+              alt="Vibrant wildflower field under a bright blue sky"
+            />
+            <h3>Wildflower Fields</h3>
+            <p>Color bursting through open meadows at peak bloom.</p>
+          </article>
+
+          <article class="grid-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJtaXN0IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2M4ZDhlOCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2U4ZWVmNCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSJ1cmwoI21pc3QpIi8+CiAgPHJlY3QgeT0iMjIwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjNWE3YTVhIiBvcGFjaXR5PSIwLjYiLz4KICA8cmVjdCB4PSIxNzAiIHk9IjgwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjIwIiBmaWxsPSIjOGE2YTUwIi8+CiAgPHBvbHlnb24gcG9pbnRzPSIxMDAsMjIwIDE4MCw2MCAyNjAsMjIwIiBmaWxsPSIjMmE1YTJhIiBvcGFjaXR5PSIwLjciLz4KICA8cG9seWdvbiBwb2ludHM9IjE0MCwyMjAgMjAwLDgwIDI2MCwyMjAiIGZpbGw9IiMzYTdhM2EiIG9wYWNpdHk9IjAuOCIvPgogIDxyZWN0IHg9IjUwIiB5PSIxMDAiIHdpZHRoPSIxNCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiM4YTZhNTAiLz4KICA8cG9seWdvbiBwb2ludHM9IjAsMjIwIDU3LDgwIDExNCwyMjAiIGZpbGw9IiMyYTVhMmEiIG9wYWNpdHk9IjAuNiIvPgogIDxyZWN0IHg9IjMxMCIgeT0iMTEwIiB3aWR0aD0iMTQiIGhlaWdodD0iMTkwIiBmaWxsPSIjOGE2YTUwIi8+CiAgPHBvbHlnb24gcG9pbnRzPSIyNjAsMjIwIDMxNyw5MCAzNzQsMjIwIiBmaWxsPSIjMmE1YTJhIiBvcGFjaXR5PSIwLjYiLz4KICA8cmVjdCB5PSIyMDAiIHdpZHRoPSI0MDAiIGhlaWdodD0iMTAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC41KSIvPgogIDxyZWN0IHk9IjIzMCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI4IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuNCkiLz4KICA8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0icmdiYSg4MCw4MCw4MCwwLjUpIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNCIgbGV0dGVyLXNwYWNpbmc9IjMiPklOVE8gVEhFIE1JU1Q8L3RleHQ+Cjwvc3ZnPg=="
+              alt="Misty forest path disappearing into the fog"
+            />
+            <h3>Into the Mist</h3>
+            <p>Forest landscapes wrapped in atmospheric fog.</p>
+          </article>
+
+        </div>
+      </section>
+
+    </div><!-- /page-home -->
+
+    <!-- ───────────── PAGE: GALLERY ───────────── -->
+    <div id="page-gallery" class="page" role="region" aria-label="Gallery page">
+
+      <section class="page-hero" aria-labelledby="gallery-heading">
+        <h1 id="gallery-heading">The Gallery</h1>
+        <p>A collection of moments — wilderness, urban, and everything between.</p>
+      </section>
+
+      <!-- Flex Gallery – 6 images + nth-child -->
+      <section class="gallery-section" aria-label="Photo gallery">
+        <div class="flex-gallery">
+
+          <figure class="gallery-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iMzM0IiB2aWV3Qm94PSIwIDAgNTAwIDMzNCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJ2c2t5IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzBhMTYyOCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFlM2E1YSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iMzM0IiBmaWxsPSJ1cmwoI3Zza3kpIi8+CiAgPHBhdGggZD0iTTAsMjAwIFExMjUsMTQwIDI1MCwxODAgUTM3NSwyMjAgNTAwLDE2MCBMNTAwLDMzNCBMMCwzMzRaIiBmaWxsPSIjMWEzYTFhIi8+CiAgPHBhdGggZD0iTTAsMjIwIFExMjUsMTcwIDI1MCwyMDAgUTM3NSwyMzAgNTAwLDE4NSBMNTAwLDMzNCBMMCwzMzRaIiBmaWxsPSIjMGQyMDEwIi8+CiAgPHJlY3QgeT0iMCIgd2lkdGg9IjUwMCIgaGVpZ2h0PSIzMzQiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNikiLz4KICA8ZWxsaXBzZSBjeD0iMjUwIiBjeT0iMjQwIiByeD0iMjAwIiByeT0iMjUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wOCkiLz4KICA8ZWxsaXBzZSBjeD0iMjUwIiBjeT0iMjU1IiByeD0iMTUwIiByeT0iMTgiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNikiLz4KICA8dGV4dCB4PSIyNTAiIHk9IjMxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjI1KSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGxldHRlci1zcGFjaW5nPSIzIj5WQUxMRVkgRk9HPC90ZXh0Pgo8L3N2Zz4="
+              alt="Aerial view of green forest with morning fog rolling through valleys"
+            />
+            <figcaption>Valley Fog – Oregon, 2023</figcaption>
+          </figure>
+
+          <figure class="gallery-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iMzM0IiB2aWV3Qm94PSIwIDAgNTAwIDMzNCI+CiAgPHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSIzMzQiIGZpbGw9IiNkNGU4ZjAiLz4KICA8cmVjdCB5PSIyMjAiIHdpZHRoPSI1MDAiIGhlaWdodD0iMTE0IiBmaWxsPSIjZThmNGY4Ii8+CiAgPGVsbGlwc2UgY3g9IjI1MCIgY3k9IjIyMCIgcng9IjI1MCIgcnk9IjE1IiBmaWxsPSJyZ2JhKDIwMCwyMjAsMjQwLDAuNSkiLz4KICA8cG9seWdvbiBwb2ludHM9IjIxMCwxODAgMjUwLDEwMCAyOTAsMTgwIiBmaWxsPSIjZTg2MjJhIi8+CiAgPHBvbHlnb24gcG9pbnRzPSIyMjAsMTgwIDI1MCwxMTUgMjgwLDE4MCIgZmlsbD0iI2Q0NTAxZSIvPgogIDxlbGxpcHNlIGN4PSIyNTAiIGN5PSIxODUiIHJ4PSI0NSIgcnk9IjQwIiBmaWxsPSIjZTg2MjJhIi8+CiAgPGVsbGlwc2UgY3g9IjI1MCIgY3k9IjE5NSIgcng9IjMwIiByeT0iMjUiIGZpbGw9IiNmNWQ1YzAiLz4KICA8Y2lyY2xlIGN4PSIyMzUiIGN5PSIxNzUiIHI9IjgiIGZpbGw9IiMxYTFhMWEiLz4KICA8Y2lyY2xlIGN4PSIyNjUiIGN5PSIxNzUiIHI9IjgiIGZpbGw9IiMxYTFhMWEiLz4KICA8Y2lyY2xlIGN4PSIyMzciIGN5PSIxNzMiIHI9IjMiIGZpbGw9IndoaXRlIi8+CiAgPGNpcmNsZSBjeD0iMjY3IiBjeT0iMTczIiByPSIzIiBmaWxsPSJ3aGl0ZSIvPgogIDxlbGxpcHNlIGN4PSIyNTAiIGN5PSIxOTAiIHJ4PSI2IiByeT0iNCIgZmlsbD0iIzFhMWExYSIvPgogIDx0ZXh0IHg9IjI1MCIgeT0iMzEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJyZ2JhKDYwLDgwLDEwMCwwLjQpIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNCIgbGV0dGVyLXNwYWNpbmc9IjMiPldJTlRFUiBGT1g8L3RleHQ+Cjwvc3ZnPg=="
+              alt="Red fox sitting in a snowy field looking directly at the camera"
+            />
+            <figcaption>Winter Fox – Finland, 2023</figcaption>
+          </figure>
+
+          <figure class="gallery-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iMzM0IiB2aWV3Qm94PSIwIDAgNTAwIDMzNCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJqdW5nbGUiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMGEyMDEwIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMWE0MDIwIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSIzMzQiIGZpbGw9InVybCgjanVuZ2xlKSIvPgogIDxyZWN0IHg9IjE5NSIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyODAiIGZpbGw9IiNhOGM4ZTgiIG9wYWNpdHk9IjAuODUiLz4KICA8cmVjdCB4PSIyMDUiIHdpZHRoPSIxNSIgaGVpZ2h0PSIyODAiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjMiLz4KICA8cmVjdCB4PSIyMjUiIHdpZHRoPSI4IiBoZWlnaHQ9IjI4MCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuMiIvPgogIDxyZWN0IHg9IjAiIHdpZHRoPSIxOTUiIGhlaWdodD0iMzM0IiBmaWxsPSIjMWE0YTFhIiBvcGFjaXR5PSIwLjkiLz4KICA8cmVjdCB4PSIzMDUiIHdpZHRoPSIxOTUiIGhlaWdodD0iMzM0IiBmaWxsPSIjMWE0YTFhIiBvcGFjaXR5PSIwLjkiLz4KICA8ZWxsaXBzZSBjeD0iMjUwIiBjeT0iMjg1IiByeD0iMTIwIiByeT0iMzUiIGZpbGw9IiM1YTlhYmYiIG9wYWNpdHk9IjAuOCIvPgogIDxlbGxpcHNlIGN4PSIyNTAiIGN5PSIyOTAiIHJ4PSIxMDAiIHJ5PSIyNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjMpIi8+CiAgPHRleHQgeD0iMjUwIiB5PSIzMjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4zKSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGxldHRlci1zcGFjaW5nPSIzIj5ISURERU4gRkFMTFM8L3RleHQ+Cjwvc3ZnPg=="
+              alt="Tall waterfall cascading down a rocky cliff into a jungle pool"
+            />
+            <figcaption>Hidden Falls – Costa Rica, 2022</figcaption>
+          </figure>
+
+          <figure class="gallery-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iMzM0IiB2aWV3Qm94PSIwIDAgNTAwIDMzNCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJkc2t5IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2U4OTM2ZCIvPjxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjZjVjOTdhIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmRlOGEwIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSIzMzQiIGZpbGw9InVybCgjZHNreSkiLz4KICA8cGF0aCBkPSJNMCwyMDAgUTEwMCwxNTAgMjAwLDIwMCBRMzAwLDI1MCA0MDAsMTcwIFE0NTAsMTQwIDUwMCwxODAgTDUwMCwzMzQgTDAsMzM0WiIgZmlsbD0iI2M4YTA2MCIvPgogIDxwYXRoIGQ9Ik0wLDI0MCBRMTAwLDIwMCAyNTAsMjMwIFE0MDAsMjYwIDUwMCwyMjAgTDUwMCwzMzQgTDAsMzM0WiIgZmlsbD0iI2IwODA0MCIvPgogIDxwYXRoIGQ9Ik0wLDI3MCBRMjAwLDI1MCA1MDAsMjYwIEw1MDAsMzM0IEwwLDMzNFoiIGZpbGw9IiM5YTcwMzAiLz4KICA8bGluZSB4MT0iNTAiIHkxPSIzMzQiIHgyPSIxMjAiIHkyPSIyMDAiIHN0cm9rZT0icmdiYSgwLDAsMCwwLjE1KSIgc3Ryb2tlLXdpZHRoPSI2MCIvPgogIDxsaW5lIHgxPSIzMDAiIHkxPSIzMzQiIHgyPSI0MDAiIHkyPSIxNzAiIHN0cm9rZT0icmdiYSgwLDAsMCwwLjEyKSIgc3Ryb2tlLXdpZHRoPSI4MCIvPgogIDx0ZXh0IHg9IjI1MCIgeT0iMzE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJyZ2JhKDEwMCw2MCwyMCwwLjQpIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxNCIgbGV0dGVyLXNwYWNpbmc9IjMiPkRVTkUgU0hBRE9XPC90ZXh0Pgo8L3N2Zz4="
+              alt="Dramatic desert sand dunes at sunrise with long shadows"
+            />
+            <figcaption>Dune Shadow – Sahara, 2022</figcaption>
+          </figure>
+
+          <figure class="gallery-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iMzM0IiB2aWV3Qm94PSIwIDAgNTAwIDMzNCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJsc2t5IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzFhMmE0YSIvPjxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjNWE4YWJmIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjOGFiOGU4Ii8+PC9saW5lYXJHcmFkaWVudD4KICA8bGluZWFyR3JhZGllbnQgaWQ9Imx3YXRlciIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM4YWI4ZTgiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxYTNhNmEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNTAwIiBoZWlnaHQ9IjMzNCIgZmlsbD0idXJsKCNsc2t5KSIvPgogIDxwb2x5Z29uIHBvaW50cz0iMTYwLDE2NyAyNTAsNjAgMzQwLDE2NyIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPgogIDxwb2x5Z29uIHBvaW50cz0iMTgwLDE2NyAyNTAsODAgMzIwLDE2NyIgZmlsbD0iI2I4ZDBlOCIgb3BhY2l0eT0iMC43Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSI1MCwxNjcgMTMwLDkwIDIxMCwxNjciIGZpbGw9IiNkOGU4ZjAiIG9wYWNpdHk9IjAuOCIvPgogIDxwb2x5Z29uIHBvaW50cz0iMjkwLDE2NyAzODAsODUgNDcwLDE2NyIgZmlsbD0iI2QwZTRmMCIgb3BhY2l0eT0iMC44Ii8+CiAgPHJlY3QgeT0iMTY3IiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjE2NyIgZmlsbD0idXJsKCNsd2F0ZXIpIi8+CiAgPHBvbHlnb24gcG9pbnRzPSIxNjAsMTY3IDI1MCwyNzQgMzQwLDE2NyIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuNCIvPgogIDx0ZXh0IHg9IjI1MCIgeT0iMzIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMykiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiBmb250LXNpemU9IjE0IiBsZXR0ZXItc3BhY2luZz0iMyI+TUlSUk9SIExBS0U8L3RleHQ+Cjwvc3ZnPg=="
+              alt="Snow-capped mountain peaks reflected perfectly in a glacial lake"
+            />
+            <figcaption>Mirror Lake – Alps, 2023</figcaption>
+          </figure>
+
+          <figure class="gallery-item">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iMzM0IiB2aWV3Qm94PSIwIDAgNTAwIDMzNCI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJzdW5za3kiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEwYTJhIi8+PHN0b3Agb2Zmc2V0PSIzMCUiIHN0b3AtY29sb3I9IiM4YjIyNTIiLz48c3RvcCBvZmZzZXQ9IjYwJSIgc3RvcC1jb2xvcj0iI2U4NjIyYSIvPjxzdG9wIG9mZnNldD0iODUlIiBzdG9wLWNvbG9yPSIjZjVhNjIzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmRlMDYwIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSIzMzQiIGZpbGw9InVybCgjc3Vuc2t5KSIvPgogIDxyZWN0IHk9IjI2MCIgd2lkdGg9IjUwMCIgaGVpZ2h0PSI3NCIgZmlsbD0iIzBhMTgyOCIvPgogIDxlbGxpcHNlIGN4PSIyNTAiIGN5PSIyNjIiIHJ4PSIyNTAiIHJ5PSIxMiIgZmlsbD0iIzFhMzA1MCIgb3BhY2l0eT0iMC43Ii8+CiAgPHJlY3QgeT0iMjYwIiB3aWR0aD0iNTAwIiBoZWlnaHQ9Ijc0IiBmaWxsPSJyZ2JhKDI0NSwxNjYsMzUsMC4wOCkiLz4KICA8ZWxsaXBzZSBjeD0iMjUwIiBjeT0iMjYwIiByeD0iODAiIHJ5PSI4IiBmaWxsPSJyZ2JhKDI1MywyMjQsOTYsMC4zNSkiLz4KICA8ZWxsaXBzZSBjeD0iMjUwIiBjeT0iMjYwIiByeD0iMTgwIiByeT0iNSIgZmlsbD0icmdiYSgyNTMsMjI0LDk2LDAuMTUpIi8+CiAgPHRleHQgeD0iMjUwIiB5PSIzMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9InJnYmEoMjU1LDIyMCwxMDAsMC4zNSkiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiBmb250LXNpemU9IjE0IiBsZXR0ZXItc3BhY2luZz0iMyI+UEFDSUZJQyBTVU5TRVQ8L3RleHQ+Cjwvc3ZnPg=="
+              alt="Sunset over the ocean with vivid orange and pink clouds"
+            />
+            <figcaption>Pacific Sunset – California, 2023</figcaption>
+          </figure>
+
+        </div>
+      </section>
+
+    </div><!-- /page-gallery -->
+
+    <!-- ───────────── PAGE: ABOUT ───────────── -->
+    <div id="page-about" class="page" role="region" aria-label="About page">
+
+      <section class="page-hero" aria-labelledby="about-heading">
+        <h1 id="about-heading">About the Photographer</h1>
+        <p>Chasing light across every continent — one frame at a time.</p>
+      </section>
+
+      <!-- About Grid (2 columns) -->
+      <section class="about-section" aria-label="About details">
+        <div class="about-grid">
+
+          <div class="about-image">
+            <img
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iNjY3IiB2aWV3Qm94PSIwIDAgNTAwIDY2NyI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJwc2t5IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzFhMWEyZSIvPjxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjZTg2MjJhIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZjVhNjIzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSI2NjciIGZpbGw9InVybCgjcHNreSkiLz4KICA8ZWxsaXBzZSBjeD0iMjUwIiBjeT0iNTgwIiByeD0iMjUwIiByeT0iMzAiIGZpbGw9InJnYmEoMjQ1LDE2NiwzNSwwLjIpIi8+CiAgPHJlY3QgeT0iNTUwIiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjExNyIgZmlsbD0iIzBhMTAyMCIvPgogIDxlbGxpcHNlIGN4PSIyNTAiIGN5PSI1NTAiIHJ4PSIyNTAiIHJ5PSIyMCIgZmlsbD0iIzBhMTAyMCIvPgogIDxyZWN0IHg9IjIyMCIgeT0iMzgwIiB3aWR0aD0iNjAiIGhlaWdodD0iMTcwIiBmaWxsPSIjMGQwZDFhIi8+CiAgPGVsbGlwc2UgY3g9IjI1MCIgY3k9IjM3NSIgcng9IjM4IiByeT0iMzgiIGZpbGw9IiMxYTFhMmUiLz4KICA8cmVjdCB4PSIyMTAiIHk9IjQyMCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjgiIGZpbGw9IiMwZDBkMWEiLz4KICA8cmVjdCB4PSIyMzUiIHk9IjM2MCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMmEyYTNlIiByeD0iMyIvPgogIDxyZWN0IHg9IjI0MCIgeT0iMzU1IiB3aWR0aD0iMjAiIGhlaWdodD0iOCIgZmlsbD0iIzNhM2E1YSIgcng9IjIiLz4KICA8Y2lyY2xlIGN4PSIyNTAiIGN5PSI1NTAiIHI9IjgiIGZpbGw9InJnYmEoMjQ1LDE2NiwzNSwwLjUpIi8+CiAgPHRleHQgeD0iMjUwIiB5PSI2MzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4zKSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGxldHRlci1zcGFjaW5nPSIzIj5BTEVYIFJJVkVSQTwvdGV4dD4KPC9zdmc+"
+              alt="Photographer silhouette standing on a hill at sunset with a camera"
+            />
+          </div>
+
+          <div class="about-text">
+            <h2>Hello, I'm Duong</h2>
+            <p>
+              I'm a nature and travel photographer based in San Francisco, CA.
+              For the past decade I've wandered deserts, rainforests, and mountain ranges
+              with a camera, searching for the brief window of perfect light.
+            </p>
+            <p>
+              My work has appeared in <em>National Geographic Traveler</em>,
+              <em>Outdoor Photographer</em>, and various gallery exhibitions
+              across North America and Europe.
+            </p>
+            <p>
+              Every photograph is a collaboration with nature —
+              I just show up and try not to miss it.
+            </p>
+            <button class="btn" onclick="showPage('gallery')">View My Work</button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Gear Grid (2 columns) -->
+      <section class="equipment-section" aria-labelledby="gear-heading">
+        <h2 id="gear-heading">Gear &amp; Approach</h2>
+        <div class="gear-grid">
+
+          <article class="gear-card">
+            <h3>Camera Bodies</h3>
+            <p>Sony A7R V &amp; Nikon Z9 for landscapes and wildlife.
+               Lightweight mirrorless for hiking.</p>
+          </article>
+
+          <article class="gear-card">
+            <h3>Lenses</h3>
+            <p>24–70mm f/2.8 for versatility. 500mm telephoto for wildlife.
+               14mm ultra-wide for grand vistas.</p>
+          </article>
+
+          <article class="gear-card">
+            <h3>Post-Processing</h3>
+            <p>Adobe Lightroom for culling and color grading.
+               Photoshop for composites and fine detail work.</p>
+          </article>
+
+          <article class="gear-card">
+            <h3>Philosophy</h3>
+            <p>Minimal editing — the magic happens in the field, not on the screen.
+               Natural light always wins.</p>
+          </article>
+
+        </div>
+      </section>
+
+    </div><!-- /page-about -->
+
+  </main>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+  <footer>
+    <p>&copy; 2024 LensLife Photography. All rights reserved.</p>
+  </footer>
+
+  <!-- ══════════════════════════════════════════
+       JAVASCRIPT – SPA page switching
+  ══════════════════════════════════════════ -->
+  <script>
+    /**
+     * showPage(name) – ẩn tất cả các trang, hiện trang được chọn,
+     * cập nhật trạng thái active cho nút nav và aria-current.
+     */
+    function showPage(name) {
+      // Ẩn tất cả page
+      document.querySelectorAll('.page').forEach(function(p) {
+        p.classList.remove('active');
+      });
+
+      // Hiện page được chọn
+      var target = document.getElementById('page-' + name);
+      if (target) target.classList.add('active');
+
+      // Cập nhật nav buttons
+      document.querySelectorAll('.nav-links button').forEach(function(btn) {
+        btn.classList.remove('active');
+        btn.removeAttribute('aria-current');
+      });
+      var activeBtn = document.getElementById('nav-' + name);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.setAttribute('aria-current', 'page');
+      }
+
+      // Cuộn lên đầu trang
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Cập nhật tiêu đề tab
+      var titles = {
+        home:    'LensLife – Photography Portfolio',
+        gallery: 'Gallery – LensLife Photography',
+        about:   'About – LensLife Photography'
+      };
+      document.title = titles[name] || 'LensLife';
+    }
+  </script>
+
+</body>
+</html>
